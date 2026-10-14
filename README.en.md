@@ -5,7 +5,7 @@
 
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-0.9.8--beta-blue) ![Platform](https://img.shields.io/badge/platform-Android%2011%2B-lightgrey) ![Framework](https://img.shields.io/badge/Kotlin-Compose-purple) ![License](https://img.shields.io/badge/license-All%20Rights%20Reserved-red)
+![Version](https://img.shields.io/badge/version-0.9.9--beta-blue) ![Platform](https://img.shields.io/badge/platform-Android%2011%2B-lightgrey) ![Framework](https://img.shields.io/badge/Kotlin-Compose-purple) ![License](https://img.shields.io/badge/license-All%20Rights%20Reserved-red)
 
 </div>
 
@@ -18,11 +18,11 @@
 - 📷 **QR-code token import**: works with the QR-code export in the desktop "Token Manager" — just scan with your phone camera to import the token securely; the desktop QR code refreshes every 15 seconds, the token is transmitted encrypted, and only the owning account can import it; if camera permission is denied, you can jump to system settings with one tap to enable it, and the system back key exits the scan page directly
 - 🖥️ **Media on the go**: fully use Kirara Media on your phone — browse the library, view details, and watch videos, with visuals and controls consistent with the desktop
 - 🎬 **Immersive landscape playback**: rotating to landscape during playback automatically enters fullscreen and hides the system bars; during fullscreen, double-taps / accidental touches do not exit fullscreen, and pressing the system back key exits fullscreen but **the video keeps playing** (no pause); leaving the media page pauses playback automatically, and returning does not auto-resume
-- 🤖 **Auto-login**: opening the media page completes login automatically; when already logged in, it is intelligently skipped. If problems occur, it **honestly explains the reason** — for example, when offline the login page shows "Network request failed. Please check your network connection" instead of silently falling back to the login page; you can also log in manually at any time
+- 🤖 **Auto-login**: opening the media page completes login automatically; when already logged in, it is intelligently skipped. If problems occur, it **honestly explains the reason** — for example, when offline the login page shows "Network request failed. Please check your network connection" instead of silently falling back to the login page; you can also log in manually at any time; when the server shows a **notice / maintenance page**, the bottom-right button turns into **Refresh** — tap it after handling the notice to reload and check whether service has resumed
 - 🧾 **Remembered login usernames**: previously used usernames are remembered, and next time you can tap the button on the right of the username field to pick one from the history list with one tap, or delete entries one by one; **only usernames are remembered, passwords are never saved**
 - 🔒 **Password cleared on logout**: after actively logging out and returning to the login page, the password field is cleared automatically, leaving no input residue from the previous session (the username and the "Remember login" checkbox are retained)
 - 💬 **Issue comments**: open the comment area with one tap on the video detail page, supporting posting comments, replies, likes, and @ mentions of friends; synced in real time with what you see on the desktop
-- 🗣️ **Community page**: browse what everyone shares on the homepage and like with one tap; tap a resource name to expand its cover preview (tap the image to view it larger), tap "View" to jump straight to watching, and your own comments can be shared to the community with one tap
+- 🗣️ **Community page**: browse what everyone shares on the homepage and like with one tap; tap a resource name to expand its cover preview (tap the image to view it larger — **pinch to zoom freely**), tap "View" to jump straight to watching, and your own comments can be shared to the community with one tap
 - 🔔 **Interaction reminders**: being @ mentioned, replied to, or liked all trigger a notification in your phone's notification shade, with an unread green dot in the navigation bar; supports marking a single item read, marking all read, and clearing all; resources can expand a cover preview with one-tap "View" jump, and cover loading failures auto-refresh and retry (no more "collapses on one tap"); **you still receive them after exiting the app**
 - 🎨 **Appearance themes**: follow the system, or freely switch between day / night modes and 48 accent colors, taking effect immediately
 - 🧹 **Data management**: separately "Clear Cache" or "Clear All Data" to free up space and rule out issues; after clearing, the app closes automatically and reopening gives a clean state; on startup, new versions also automatically clean up old installers to save space
@@ -73,7 +73,7 @@
 
 - **Media browsing**: tap the bottom-right button on the video detail page to open the comment area; the title bar automatically shows the video name
 - **Comment area**: post comments, reply, like, and @ mention friends; type `@` to pick from your friend list
-- **Community page**: browse and like homepage shares; tap a resource name to expand the cover preview (tap the image for a larger view), and tap "View" to jump back to the media page to watch
+- **Community page**: browse and like homepage shares; tap a resource name to expand the cover preview (tap the image for a larger view — **pinch to zoom and drag to pan**), and tap "View" to jump back to the media page to watch
 - **My Favorites**: favorited videos expand their previews by default (you can turn off "Always show favorite resource previews" in "Settings → Resource Preview"); tap the image for a larger view, tap "View" to go straight there, and tap the resource name to collapse
 - **Immersive viewing**: rotating to landscape during playback enters fullscreen automatically; double-taps / accidental touches do not exit fullscreen, and the system back key exits fullscreen while playback continues; leaving the media page pauses playback automatically
 - **Interactions page**: view reminders for @ mentions, replies, and likes; supports marking read, marking all read, and clearing all; a green dot appears in the navigation bar when there are new messages; covers auto-refresh on load failure
