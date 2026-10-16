@@ -5,7 +5,7 @@
 
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-0.9.9--beta-blue) ![Platform](https://img.shields.io/badge/platform-Android%2011%2B-lightgrey) ![Framework](https://img.shields.io/badge/Kotlin-Compose-purple) ![License](https://img.shields.io/badge/license-All%20Rights%20Reserved-red)
+![Version](https://img.shields.io/badge/version-1.0.0-blue) ![Platform](https://img.shields.io/badge/platform-Android%2011%2B-lightgrey) ![Framework](https://img.shields.io/badge/Kotlin-Compose-purple) ![License](https://img.shields.io/badge/license-All%20Rights%20Reserved-red)
 
 </div>
 
@@ -25,6 +25,7 @@
 - 🗣️ **Community page**: browse what everyone shares on the homepage and like with one tap; tap a resource name to expand its cover preview (tap the image to view it larger — **pinch to zoom freely**), tap "View" to jump straight to watching, and your own comments can be shared to the community with one tap
 - 🔔 **Interaction reminders**: being @ mentioned, replied to, or liked all trigger a notification in your phone's notification shade, with an unread green dot in the navigation bar; supports marking a single item read, marking all read, and clearing all; resources can expand a cover preview with one-tap "View" jump, and cover loading failures auto-refresh and retry (no more "collapses on one tap"); **you still receive them after exiting the app**
 - 🎨 **Appearance themes**: follow the system, or freely switch between day / night modes and 48 accent colors, taking effect immediately
+- 🖼️ **Change avatar**: tap the "Edit" button on the account card in Settings and the card expands downwards to reveal "Change avatar" (you can also **just tap the avatar**); the picked image is center-cropped to a square automatically and uploaded, GIFs keep their animation, and the new avatar appears on **every page** immediately without restarting
 - 🧹 **Data management**: separately "Clear Cache" or "Clear All Data" to free up space and rule out issues; after clearing, the app closes automatically and reopening gives a clean state; on startup, new versions also automatically clean up old installers to save space
 - ⚙️ **Resource preview settings**: you can make resource previews "always show" (by default collapsed, expanded by tapping the resource name); within favorites you can separately enable "Always show favorite resource previews" (on by default; when off, it reverts to expanding by tapping the resource name)
 - ⬆️ **In-app updates**: automatically checks for new versions, shows release notes, downloads in-app → **SHA-256 verification** → launches the system installer to complete installation; if the download fails, you can switch to a browser fallback with one tap; upgrades use a unified official signature, so you can install over the old version directly and keep your data
