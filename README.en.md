@@ -5,7 +5,7 @@
 
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-1.2.0-blue) ![Platform](https://img.shields.io/badge/platform-Android%2011%2B-lightgrey) ![Framework](https://img.shields.io/badge/Kotlin-Compose-purple) ![License](https://img.shields.io/badge/license-All%20Rights%20Reserved-red)
+![Version](https://img.shields.io/badge/version-1.2.1-blue) ![Platform](https://img.shields.io/badge/platform-Android%2011%2B-lightgrey) ![Framework](https://img.shields.io/badge/Kotlin-Compose-purple) ![License](https://img.shields.io/badge/license-All%20Rights%20Reserved-red)
 
 </div>
 
@@ -22,6 +22,8 @@
 - 🧾 **Remembered login usernames**: previously used usernames are remembered, and next time you can tap the button on the right of the username field to pick one from the history list with one tap, or delete entries one by one; **only usernames are remembered, passwords are never saved**
 - 🔒 **Password cleared on logout**: after actively logging out and returning to the login page, the password field is cleared automatically, leaving no input residue from the previous session (the username and the "Remember login" checkbox are retained)
 - 💬 **Issue comments**: open the comment area with one tap on the video detail page, supporting posting comments, replies, likes, and @ mentions of friends; @ mentions are highlighted in the theme color and **look the same from every account's view** (fixed: they used to lose the highlight for other viewers); **the reply input has its own @ button too** (pick users, backspace deletes the whole @ field — the full set of @ behaviors), the @ list **includes yourself** (mentioning yourself sends no push notification); replying to a reply automatically inserts an `@name` prefix that backspace removes as a whole; synced in real time with what you see on the desktop
+- 📊 **Glanceable counts**: like counts above 999 now shorten automatically (`1.2K` / `50.7K` / `1.3M`) instead of stretching an entry; on a comment row the "Reply" button stays exactly in place and the hearts of neighbouring entries line up
+- 📖 **Nothing gets truncated**: interaction entries, resource names and library tags now **wrap and show in full**, with the container growing downwards instead of adding "…"; tapping a resource name highlights the **whole rounded container** (no more square box around it)
 - 🗣️ **Community page**: browse what everyone shares on the homepage and like with one tap; tap a resource name to expand its cover preview (tap the image to view it larger — **pinch to zoom freely**), tap "View" to jump straight to watching, and your own comments can be shared to the community with one tap
 - 🔔 **Interaction reminders**: being @ mentioned, replied to, or liked all trigger a notification in your phone's notification shade, with an unread green dot in the navigation bar; supports marking a single item read, marking all read, and clearing all; resources can expand a cover preview with one-tap "View" jump, and cover loading failures auto-refresh and retry (no more "collapses on one tap"); **you still receive them after exiting the app**
 - 🎨 **Appearance themes**: follow the system, or freely switch between day / night modes and 48 accent colors, taking effect immediately
