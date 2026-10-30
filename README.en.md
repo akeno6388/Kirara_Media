@@ -5,7 +5,7 @@
 
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-1.3.0-blue) ![Platform](https://img.shields.io/badge/platform-Android%2011%2B-lightgrey) ![Framework](https://img.shields.io/badge/Kotlin-Compose-purple) ![License](https://img.shields.io/badge/license-All%20Rights%20Reserved-red)
+![Version](https://img.shields.io/badge/version-1.3.1-blue) ![Platform](https://img.shields.io/badge/platform-Android%2011%2B-lightgrey) ![Framework](https://img.shields.io/badge/Kotlin-Compose-purple) ![License](https://img.shields.io/badge/license-All%20Rights%20Reserved-red)
 
 </div>
 
