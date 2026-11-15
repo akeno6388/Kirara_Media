@@ -1,550 +1,165 @@
 # Kirara_Media
 
-> A mobile client for Kirara Media that lets you enjoy media, join issue discussions, and interact with friends on your phone.
-> Through the three steps **Log in with KIRARA Passport → Link Token → Open Media Page**, you configure once and thereafter log in automatically with password-free direct access.
->
-> **iOS (on the same version line as Android since 1.5.0, distributed by sideloading)**: shares the same `:shared` code as Android (Media / Community / Interaction tabs, real auth and data repositories, live interaction notifications, photo picker, QR scanning, avatar crop pipeline, native toast HUD), with a SwiftUI host shell; requires **iOS 16.0+** (iPhone and iPad). **Not published on the App Store**: from `1.5.0` the build is also delivered as `Kirara_Media_v1.5.0.ipa` (same naming as the APK, with a `.sha256` file) — installation paths are under "Installation and Updates"; build and on-device steps: [`iosApp/README.md`](iosApp/README.md#上真机xcodeiphone-直连). Progress, evidence and remaining boundaries: [`app/docs/Kirara Media iOS 迁移路线.md`](app/docs/Kirara%20Media%20iOS%20迁移路线.md) §15.
+<p align="center">
+  <img src="https://img.shields.io/badge/Version-1.5.0-blue" alt="Version">
+  <img src="https://img.shields.io/badge/Platform-Android%2011%2B%20%7C%20iOS%2016%2B-3DDC84" alt="Platform">
+  <img src="https://img.shields.io/badge/Kotlin-Multiplatform-7F52FF" alt="Kotlin Multiplatform">
+  <img src="https://img.shields.io/badge/License-All%20Rights%20Reserved-lightgrey" alt="License">
+</p>
 
-<div align="center">
+<p align="center"><a href="README.md">简体中文</a> | English</p>
 
-![Version](https://img.shields.io/badge/version-1.5.0-blue) ![Platform](https://img.shields.io/badge/platform-Android%2011%2B%20%7C%20iOS%2016%2B-lightgrey) ![Framework](https://img.shields.io/badge/Kotlin-Compose-purple) ![License](https://img.shields.io/badge/license-All%20Rights%20Reserved-red)
+**The mobile client for Kirara Media.** Kirara Media is the film and TV site on Kirara_Server. Sign in to your passport once and the app signs in for you from then on: library, comments, community and interaction notifications are all here.
 
-</div>
+Android and iOS share the same business logic; each platform renders it with its own native look and feel.
 
 ---
 
-## ✨ Features
+## What it does
 
-- 🔐 **Log in once, stay password-free**: log in with your passport once, and the app enters automatically every time thereafter — no repeated username and password entry
-- 🔑 **Token Manager**: centrally keeps your media account tokens, supporting manual entry and QR-code import; tokens are stored encrypted and readable only on this device
-- 📷 **QR-code token import**: works with the QR-code export in the desktop "Token Manager" — just scan with your phone camera to import the token securely; the desktop QR code refreshes every 15 seconds, the token is transmitted encrypted, and only the owning account can import it; if camera permission is denied, you can jump to system settings with one tap to enable it, and the system back key exits the scan page directly
-- 🖥️ **Media on the go**: fully use Kirara Media on your phone — browse the library, view details, and watch videos, with visuals and controls consistent with the desktop
-- 🎬 **Immersive landscape playback**: rotating to landscape during playback automatically enters fullscreen and hides the system bars; during fullscreen, double-taps / accidental touches do not exit fullscreen, and pressing the system back key exits fullscreen but **the video keeps playing** (no pause); leaving the media page pauses playback automatically, and returning does not auto-resume
-- 🤖 **Auto-login**: opening the media page completes login automatically; when already logged in, it is intelligently skipped. If problems occur, it **honestly explains the reason** — for example, when offline the login page shows "Network request failed. Please check your network connection" instead of silently falling back to the login page; you can also log in manually at any time; when the server shows a **notice / maintenance page**, the bottom-right button turns into **Refresh** — tap it after handling the notice to reload and check whether service has resumed; when a dorm / campus network returns a **gateway block page** ("Access Denied"), that page is **shown right away** instead of spinning in a waiting overlay, so you can complete authentication on it directly
-- 🧾 **Remembered login usernames**: previously used usernames are remembered, and next time you can tap the button on the right of the username field to pick one from the history list with one tap, or delete entries one by one; **only usernames are remembered, passwords are never saved**
-- 🔒 **Password cleared on logout**: after actively logging out and returning to the login page, the password field is cleared automatically, leaving no input residue from the previous session (the username and the "Remember login" checkbox are retained)
-- 💬 **Issue comments**: open the comment area with one tap on the video detail page, supporting posting comments, replies, likes, and @ mentions of friends; @ mentions are highlighted in the theme color and **look the same from every account's view** (fixed: they used to lose the highlight for other viewers); **the reply input has its own @ button too** (pick users, backspace deletes the whole @ field — the full set of @ behaviors), the @ list **includes yourself** (mentioning yourself sends no push notification); replying to a reply automatically inserts an `@name` prefix that backspace removes as a whole; synced in real time with what you see on the desktop
-- 🔐 **Private mentions**: when you tap "@" to pick people, a "Private mention" checkbox appears below the list — that comment and every reply beneath it become **visible only to you and the people you mentioned**, while everyone else cannot see it at all (it simply does not exist for them); mentioned users still receive their usual interaction reminders, and you can still find it under your recent comments. The comment is prefixed with "Private:" and a privacy bar appears above the input so you can cancel before posting, and the "Share to homepage" button is hidden so the content cannot be shared; while replying inside a private thread the @ button is greyed out (the audience of a thread is fixed when it is posted, so no one else can be pulled in)
-- 💡 **Smooth hint bars**: the reply bar, the privacy bar and inline input errors no longer appear and vanish abruptly — they **fade in and out while expanding / collapsing in height**, gently pushing the input down and sliding it back, so the layout does not jump while you type
-- ⚡ **Smooth back-and-forth jumping**: tapping "View" in Community or Interactions now performs an **in-site switch instead of a full page reload**, so hopping from community to a title and straight back to another one no longer gets slower each time; rapid repeated taps coalesce into the latest target instead of queueing up, and if the in-site switch does not take effect (blocked by a gateway, for example) it falls back to a normal full load automatically
-- 🏷️ **Titles that are always right**: the title bar of the comment area and the resource name on favorites come straight from the server, so even during a jump they **never show the previous title's name or the bare site name "Jellyfin"**; titles you have already looked at come from memory, so revisiting a resource costs no network round-trip and the previously seen cases of titles falling back to the raw resource link are gone
-- 📊 **Glanceable counts**: like counts above 999 now shorten automatically (`1.2K` / `50.7K` / `1.3M`) instead of stretching an entry; on a comment row the "Reply" button stays exactly in place and the hearts of neighbouring entries line up
-- 📖 **Nothing gets truncated**: interaction entries, resource names and library tags now **wrap and show in full**, with the container growing downwards instead of adding "…"; tapping a resource name highlights the **whole rounded container** (no more square box around it)
-- 🗣️ **Community page**: browse what everyone shares on the homepage and like with one tap; tap a resource name to expand its cover preview (tap the image to view it larger — **pinch to zoom freely**), tap "View" to jump straight to watching, and your own comments can be shared to the community with one tap; the resource name on interaction entries also shows the parsed title rather than a generic "resource preview"
-- 🔔 **Interaction reminders**: **only this app's own interactions come through — media topic interactions + urge requests** — being @ mentioned, replied to, or liked, as well as **your urge request being liked / read by an administrator (approval completed)**, all trigger a notification in your phone's notification shade, with an unread green dot in the navigation bar; supports marking a single item read, marking all read, and clearing all (cleared entries **slide out + fade out while the entries below glide up smoothly**); resources can expand a cover preview with one-tap "View" jump, and cover loading failures auto-refresh and retry (no more "collapses on one tap"); **a new arrival jumps to the top automatically** — the list scrolls back to the top to show the fresh entry (smoothly while you are on the Interactions tab, instantly when you are on another tab, so it is already at the top when you switch back); **you still receive them after exiting the app** (Android only — see Platform differences for the iOS limitation). System broadcast / service notices and community homepage-share interactions belong to other apps and no longer mix into the interaction tab (the desktop notification center still receives everything)
-- 🎨 **Appearance themes**: follow the system, or freely switch between day / night modes and 48 accent colors, taking effect immediately
-- 🖼️ **Change avatar**: tap the "Edit" button on the account card in Settings and the card expands downwards to reveal "Change avatar" (you can also **just tap the avatar**); the picked image is center-cropped to a square automatically and a **preview confirmation dialog** pops up first (GIFs keep their animation, previewed with the first frame) — the upload only happens after you tap "Confirm upload"; the new avatar appears on **every page** immediately without restarting
-- ✏️ **Change nickname**: in the same expanded account card area, the "Change nickname" button sits **next to "Change avatar"** and opens a dialog for changing your display nickname (your login username stays unchanged); the account card updates immediately after saving, with no re-login needed
-- 🧹 **Data management**: separately "Clear Cache" or "Clear All Data" to free up space and rule out issues; after clearing, the app closes automatically and reopening gives a clean state; on startup, new versions also automatically clean up old installers to save space
-- ⚙️ **Resource preview settings**: you can make resource previews "always show" (by default collapsed, expanded by tapping the resource name); within favorites you can separately enable "Always show favorite resource previews" (on by default; when off, it reverts to expanding by tapping the resource name)
-- ⬆️ **In-app updates**: automatically checks for new versions, shows release notes, downloads in-app → **SHA-256 verification** → launches the system installer to complete installation; when you skip several versions, the release notes are listed **version by version**, so you can see what each missed release changed, and a mandatory release in between is never overlooked; if the download fails, you can switch to a browser fallback with one tap; upgrades use a unified official signature, so you can install over the old version directly and keep your data (**Android**; iOS is not on the App Store and has no self-update — switching versions means sideloading the new IPA, see Platform differences)
-- 🧭 **Unified navigation**: four tabs — Media / Community / Interactions / Settings — for easy switching, with the media page kept from reloading when switching tabs
+| Capability | What you get |
+| --- | --- |
+| **Library and playback** | The same library, details and playback as the desktop site. Rotating to landscape during playback goes fullscreen automatically, and leaving fullscreen keeps the video playing. |
+| **Sign in once** | The passport session renews itself. Accounts you have used are remembered; passwords are never stored. |
+| **Token import** | Scan the QR code shown on the desktop, or type the token under **Settings → Token manager**. Tokens are stored encrypted on the device. |
+| **Comments and community** | Comments, replies, likes, @ mentions and private mentions, plus the community feed, your recent comments and favourites. |
+| **Interaction notifications** | Get notified when you are mentioned, replied to or liked, and when your update request is liked or handled by an administrator. Tapping a notification jumps to the resource. |
+| **Profile** | Crop an avatar by dragging and pinching, rename yourself at any time, and see the change everywhere immediately. |
+| **Appearance** | Follow the system, or pick light / dark mode and one of 48 accent colours. |
+| **In-app updates** | On Android the package is downloaded, verified with SHA-256 and installed over the old one. On iOS the app only checks for updates; a new version must be sideloaded. |
 
-### 📱 Platform differences (Android / iOS)
+## Android vs. iOS
 
-Both platforms share the same `:shared` business code (login, repositories, comments and interactions, photo picker / QR scan / avatar crop pipeline); only the host shell differs — Compose on Android, SwiftUI on iOS. These differences come from the platforms themselves, not from missing features:
+| Item | Android 11+ | iOS 16+ |
+| --- | --- | --- |
+| Package | `Kirara_Media_vX.X.X.apk`, installable directly after allowing "install unknown apps" | `Kirara_Media_vX.X.X.ipa` with a matching `.sha256`; not on the App Store, so it must be sideloaded |
+| Updates | Download and verify in-app, then the system installer updates over the old version | Check for updates only; a new version has to be installed again |
+| Notifications | Keep arriving after you leave the app | No APNs: nothing arrives once the app is fully closed; everything is fetched when you return to the foreground |
+| Fullscreen | Rotating to landscape enters page-level fullscreen | On iPhone, native immersive mode (system bars hidden, tab bar hidden, screen kept awake); element fullscreen on iPad |
+| Background and back | System back button or gesture; **Settings → Notification optimisation** jumps to the vendor's battery / autostart page | No back button and no vendor power settings; in-page controls and gestures replace them |
 
-| Capability | Android 11+ | iOS 16+ |
-|---|---|---|
-| Installer | `Kirara_Media_vX.X.X.apk`, installed after allowing "Install unknown apps" | `Kirara_Media_vX.X.X.ipa` (same naming as the APK, shipped with a sibling `.sha256`); **not on the App Store**, so it has to be sideloaded (three ways below) |
-| In-app updates | Download + SHA-256 verification in-app → system installer installs over the old version | Check only: iOS has no self-update, so a new version means sideloading a new IPA |
-| Interaction notifications | Still received after quitting (delivered on system wake, worst case ~15 min) | No APNs: **nothing arrives after the app is fully quit**; a catch-up pull runs as soon as it returns to the foreground. Real-time while running (including in the background) |
-| Video fullscreen | Rotating to landscape enters page-level fullscreen, with native immersive as a fallback | iPhone's WKWebView has no page-level fullscreen ⇒ landscape uses **native immersive** (system bars hidden + bottom bar hidden + screen kept awake); iPad supports element fullscreen |
-| Background keep-alive | "Settings → Notification optimization settings" jumps to the vendor's battery / auto-start page | None needed (iOS schedules it automatically) |
-| Back action | System back key exits fullscreen / the scan page | No back key — in-page controls and gestures instead |
-
-## 📋 System Requirements
+## Requirements
 
 **Android**
 
-- **OS**: Android 11 or later
-- **RAM**: 4 GB or more recommended
-- **Storage**: about 80 MB for installation, plus about 200 MB or more for browsing cache
-- **Google services**: no Google services framework is required; domestic phones can use it directly
-- **Devices**: supports mainstream Android phones and tablets
+- Android 11 (API 30) or later
+- 4 GB of RAM or more recommended
+- About 85 MB for the package, plus 200 MB or more for browsing cache
+- No Google services required; Chinese OEM phones work out of the box
 
-**iOS** (since 1.5.0)
+**iOS**
 
-- **OS**: iOS 16.0 or later
-- **Devices**: iPhone and iPad (layout adapts; the tablet picks the landscape background image)
-- **Signing**: not on the App Store — this repository produces an **unsigned IPA**, so installing it requires re-signing with your own Apple ID (Sideloadly / AltStore etc.), or an OTA install of a build signed by the maintainer with a profile containing your device UDID; a provisioning profile from a free Apple ID **expires after 7 days**, after which it must be re-signed
-- **Developer environment**: only producing builds / changing code needs macOS + Xcode; **day-to-day installation and use need no Mac**
+- iOS 16.0 or later, on iPhone and iPad
+- The repository ships an **unsigned** IPA: re-sign it with your own Apple ID, or have the maintainer sign it with a provisioning profile that includes your device UDID
+- A profile signed with a free Apple ID expires after 7 days; re-sign to continue
+- No Mac is needed to install or use the app — only to build it
 
 **Both**
 
-- **Network**: must be able to connect to Kirara Server (WiFi or a stable network is recommended for watching videos)
+- A reachable Kirara Server; WiFi or a stable connection is recommended for video
 
-## ⬇️ Installation and Updates
+## Download and install
 
 ### Android
 
-1. Go to this repository's **Releases** page and download the latest package (`Kirara_Media_vX.X.X.apk`)
-2. Allow "Install unknown apps" on your phone and complete the installation
-3. After the first launch, log in with your Kirara_Server passport to start using it
-4. The app has a built-in update check: when a new version is found it shows the release notes, and you can download and verify the package in-app, after which the system installer completes an over-the-top install; if the download fails, you can switch to a browser download
+1. Download the latest `Kirara_Media_vX.X.X.apk` from **Releases**.
+2. Allow "install unknown apps" and finish installing.
+3. Sign in with your Kirara_Server passport, then link a token as described under Quick start.
+4. Later, check **Settings → Software update**; the app downloads and verifies the package and hands it to the system installer.
 
-> 📦 **In-app installation note**: the first time you use in-app updates, the system may prompt you to "Allow installation of unknown apps"; allowing once is enough. This is Android's normal security restriction for installing non-store apps and cannot be skipped.
-> ✅ **Over-the-top upgrades keep data**: since 0.9.3-beta, a unified official release signature has been used, so **new versions can be installed directly over the old one**, with login state, tokens, and settings and other local data automatically retained — no uninstall needed.
-> 🧹 **Automatic cleanup of old installers**: on first launch of a new version, previously downloaded installers are cleaned up automatically, with no manual action required.
-> ⚠️ You only need to uninstall before installing if you previously installed an **old version from another source** (for example, an early test debug build with a mismatched signature); uninstalling will clear local data.
+> Since 0.9.3-beta all release builds share one signing key, so a new version installs over the old one and keeps your session, tokens and settings. Uninstall first only if the phone carries a debug build signed with a different key. The app also cleans up previously downloaded installers on first launch.
 
-### iOS (since 1.5.0, not on the App Store)
+### iOS (not distributed via the App Store)
 
-Artifacts use **the same naming as Android**: `Kirara_Media_v<version>.ipa` plus `<same>.ipa.sha256`
-(`<hash> *<filename>`, lowercase, no BOM, LF line endings), produced on macOS by `iosApp/deploy-device.sh`
-into `iosApp/build/device/`. Pick the path that matches your setup:
+Published IPAs follow the same naming as the APK: `Kirara_Media_v<version>.ipa` plus a matching `.sha256`. To build one on macOS, run `bash iosApp/deploy-device.sh build`; the output is `iosApp/build/device/KiraraMedia-Release.ipa` (use the `unsigned` subcommand for an unsigned package). Pick whichever route fits your setup:
 
-| Path | Who it suits | Command / steps |
-|---|---|---|
-| **Xcode direct** (simplest) | You have macOS + Xcode and Xcode can see the phone (iOS 17+) | `open iosApp.xcodeproj` → pick the device → ⌘R; signing is automatic. Steps: [`iosApp/README.md`](iosApp/README.md#上真机xcodeiphone-直连) |
-| **Wireless OTA** (no cable) | Maintainer signs with a profile containing your device UDID | `bash iosApp/deploy-device.sh build` → signed IPA + `manifest.plist` + install page; put all three in **one HTTPS directory**, then open the install page in Safari on the phone (or `itms-services://?action=download-manifest&url=<dir>/manifest.plist`) |
-| **Sideloadly / AltStore re-sign** | You only have the unsigned IPA (no signing identity, or an older device) | `bash iosApp/deploy-device.sh unsigned` → `KiraraMedia-Release-unsigned.ipa`; re-sign it with **your own Apple ID** and install |
+| Route | Who it suits | How |
+| --- | --- | --- |
+| Xcode over cable | You have a Mac with Xcode and the phone is recognised | Open `iosApp/iosApp.xcodeproj`, pick the device, press ⌘R; signing is automatic. See [iosApp/README.md](iosApp/README.md) |
+| Wireless OTA | The maintainer signed the app with a profile containing your UDID | Put the IPA, `manifest.plist` and an install page in one HTTPS directory, then open the page in Safari on the phone |
+| Sideloadly / AltStore | You only have the unsigned IPA | Re-sign it with your own Apple ID and install |
 
-> 🧩 **Naming and checksums**: both platforms use `Kirara_Media_v<version>.<ext>` plus a sibling `.sha256` (lowercase hash, `*` binary marker, LF line endings) — the APK and the IPA are identical in form, so they can share one release directory.
-> 🔢 **Version line**: since 1.5.0 iOS follows the **same version number as Android** (`MARKETING_VERSION = 1.5.0`); when re-releasing the same version, only the build number (`CURRENT_PROJECT_VERSION`, already 6 for 1.5.0) increments — otherwise iOS treats it as the same version and the old app has to be removed first.
-> ⏳ **7-day validity**: a profile signed with a free Apple ID expires after 7 days (the app stops opening and asks to be re-signed); sign it again with Sideloadly / AltStore. Packages signed with a paid developer account last longer.
-> 🚫 **No self-update**: iOS does not allow downloading and installing apps from inside an app, so "Settings → Software Update" only **checks** and shows the release notes on iOS; to change versions, sideload the new IPA.
+> An unsigned IPA will not install: iOS only runs apps whose signature matches the device UDID. Since 1.5.0 iOS shares Android's version number; rebuilding the same version only bumps the build number.
 
-## 🚀 Quick Start
-
-### Three steps to get started
+## Quick start
 
 ```
-① Log in with KIRARA Passport  →  ② Link Token  →  ③ Open the media page for auto-login
+(1) Sign in  ->  (2) Link a token  ->  (3) Open the media tab
 ```
 
-1. **Log in with your passport**: enter your Kirara_Server account and password; after checking "Remember login", the app will enter automatically on future launches without re-entering them
-2. **Link a token**: choose either method —
-   - **QR-code import**: in the desktop "Token Manager", click the scan button to the right of the token to pop up a dynamic QR code, then point the phone's scan page at it to import automatically;
-   - **Manual entry**: fill in the media account token manually under "Settings → Token Manager" on the phone.
-   The **"Link Token" dot** at the bottom-right of the media page login screen can also trigger auto-login directly
-3. **One-tap access**: enter the "Media" tab, and the app will automatically complete login and stop at the Kirara Media homepage, ready to use
+1. **Sign in** with your Kirara_Server account and tick **Remember account**; the app will sign in by itself next time.
+2. **Link a token** — on the desktop, open the QR code for the token in **Token manager**, then scan it from **Settings → Token manager → Scan to import** on the phone. Manual entry works too.
+3. **Open the media tab** — the app signs in automatically and lands on the Kirara Media home page.
 
-> 💡 Don't worry if you run into login problems: the app tells you the specific reason (such as network, password, or verification code) and offers three entries — Retry / Go to Settings / Close — and you can log in manually on the page at any time.
-> 📡 For QR-code import, keep the phone and desktop on the same network, and note that the desktop QR code refreshes about every 15 seconds, so scan as soon as the pattern refreshes.
+The QR code refreshes about every 15 seconds; if it expires, scan again right after the next refresh.
 
-### Common operations
+## Everyday controls
 
-- **Media browsing**: tap the bottom-right button on the video detail page to open the comment area; the title bar automatically shows the video name
-- **Comment area**: post comments, reply, like, and @ mention friends; type `@` or tap the @ button next to the input (also in the reply input) to pick from the user list — **including yourself** (self-mentions send no push); picked @ mentions are highlighted in the theme color and look the same for everyone; replying to a reply auto-inserts an `@name` prefix that backspace deletes as a whole
-- **Community page**: browse and like homepage shares; tap a resource name to expand the cover preview (tap the image for a larger view — **pinch to zoom and drag to pan**), and tap "View" to jump back to the media page to watch
-- **My Favorites**: favorited videos expand their previews by default (you can turn off "Always show favorite resource previews" in "Settings → Resource Preview"); tap the image for a larger view, tap "View" to go straight there, and tap the resource name to collapse
-- **Immersive viewing**: rotating to landscape during playback enters fullscreen automatically; double-taps / accidental touches do not exit fullscreen, and the system back key exits fullscreen while playback continues; leaving the media page pauses playback automatically (on iOS the same immersion is done **natively**: system bars hidden + bottom bar hidden + screen kept awake; there is no back key, so fullscreen is exited with in-page controls)
-- **Interactions page**: view reminders for @ mentions, replies, and likes; supports marking read, marking all read, and clearing all; a green dot appears in the navigation bar when there are new messages; covers auto-refresh on load failure
-- **Software updates**: check for new versions under "Settings → Software Update", then download, verify, and install in-app; the first installation requires allowing "Install unknown apps" once (iOS has no self-update — this screen only checks and explains; switching versions means sideloading a new IPA)
-- **Data management**: clear cache or clear all data (after clearing, the app closes automatically and reopening gives a fresh state)
-- **Notification optimization settings**: "Background keep-alive settings" guides you to add this app to the system battery optimization whitelist, and "Auto-start" guides you to enable auto-start, so messages arrive more promptly
+- **Comments** — the button in the bottom-right corner of a video's detail page; replies reuse the bottom input bar, and the @ list includes yourself.
+- **Community** — browse and like what others shared; "View" jumps back to the media tab. **My recent comments** collects your comments, replies and shares.
+- **Favourites** — star a video on its detail page; the favourites page expands a preview and jumps straight to it.
+- **Notifications** — a green dot in the navigation bar marks unread items; mark one, all, or clear everything.
+- **Settings** — appearance, resource previews, auto-expanding comments, data management and notification optimisation.
 
-Core design:
-
-- **Consistent with the desktop experience**: the media interface and operating habits are consistent with the desktop, and the login method, comment content, and shared content are the same set, so phone and desktop connect seamlessly
-- **One codebase for Android and iOS**: both platforms share the same `:shared` business code (login, repositories, comments and interactions, photo picker / QR scan / crop), and only the host shell is platform-specific (Compose on Android, SwiftUI on iOS), so features and wording never diverge between them
-- **Effortless QR-code import**: no need to manually transcribe a long token — scanning automatically recognizes it, verifies ownership, and writes it to disk; only the owning account can import it, making it both secure and convenient
-- **Configure once, stay password-free**: the login state renews automatically; for security reasons, you need to log in again after changing phones or reinstalling the app
-- **No trouble even on failure**: auto-login submits only when it confirms it is safe, and in cases such as verification codes or network anomalies it honestly informs you and hands back control — it never retries repeatedly or fills in wrong values
-- **Updates are secure and verifiable**: installers downloaded in-app undergo integrity verification (SHA-256, etc.) before installation; if verification fails, installation is refused with a prompt, avoiding corrupted or tampered files
-- **Messages are hard to miss**: interaction messages received while the app is closed are delivered on the next launch or system wake, so you miss as little as possible
-- **Privacy first**: sensitive information such as tokens is stored encrypted inside the app, unreadable by other apps and file managers; sensitive content such as passwords never appears in any log
-- **Quiet and power-saving**: no persistent notification is used in the background, and only genuinely new messages appear in the notification shade — no extra "running" notices
-
-## ❓ FAQ
+## FAQ
 
 <details>
-<summary><b>QR-code import fails / shows rejected?</b></summary>
+<summary><b>An in-app update asks for "install unknown apps" permission.</b></summary>
 
-When importing by scanning, the KIRARA account logged in on the phone must match the desktop account that exported the token — a token can only be imported into the account that owns it, and tokens belonging to others are rejected. In addition, the desktop QR code auto-updates about every 15 seconds; if you see "QR code expired", wait for the pattern on the desktop to refresh and scan again immediately, keeping the desktop scan window open.
+That is Android's normal restriction for non-store installs and cannot be skipped. Allow it once in the system dialog; you can revoke it later in the system settings.
 </details>
 
 <details>
-<summary><b>In-app update says it needs "Install unknown apps" permission?</b></summary>
+<summary><b>Notifications stop arriving after the app has been in the background for a while.</b></summary>
 
-This is Android's normal security restriction for installing from non-store sources and cannot be skipped. The first time you use in-app updates, allow "Install unknown apps" in the system dialog that appears; after allowing once, installation works normally. If you want to manage that permission later, you can turn it on or off at any time under "System Settings → Apps → This app → Install unknown apps".
+Some Chinese OEM ROMs cut off background networking. Under **Settings → Notification optimisation**, set the battery policy to "unrestricted" and enable autostart; both entries jump to the right vendor page for your phone. Once the system has reclaimed the app, messages can arrive up to about 15 minutes late.
 </details>
 
 <details>
-<summary><b>What if the in-app update download fails?</b></summary>
+<summary><b>Why am I back at the sign-in page when I open the app offline?</b></summary>
 
-The download verifies file integrity (SHA-256, etc.). If it fails due to network fluctuations, download source restrictions, or file corruption, the dialog offers two entries — "Retry" and "Browser download": try retrying first; if it still fails, download the installer in a browser and install it manually — the result is the same (both are the same officially signed package).
+With **Remember account** enabled the app tries to sign in at launch, and that attempt cannot succeed without a network, so it returns to the sign-in page and reports "Network request failed. Please check your connection." Your credentials are kept — reopen the app once you are back online and it signs in again.
 </details>
 
 <details>
-<summary><b>I stop receiving messages after being in the background for a while?</b></summary>
+<summary><b>Scanning the QR code fails.</b></summary>
 
-Some domestic systems restrict network access after an app goes to the background, causing the message channel to disconnect (messages from that period are delivered in full on the next connection).
-You can go to "Settings → Notification optimization settings" and tap "Background keep-alive settings" to add this app to the system battery optimization whitelist, or tap "Auto-start" to enable auto-start. That way messages arrive more promptly.
+The phone and the desktop must be signed in to the same Kirara account, because a token can only be imported by its owner. The code refreshes about every 15 seconds; if it reports "QR code expired", wait for the next refresh, scan immediately and keep the desktop dialog open.
 </details>
 
 <details>
-<summary><b>Why does opening the app while offline return me to the login screen?</b></summary>
+<summary><b>Why does iOS need re-signing, and what happens after 7 days?</b></summary>
 
-After checking "Remember login", the app automatically attempts to log in on startup. **Without a network, that attempt is bound to fail, so it returns to the login screen** — this is normal, and the login page clearly shows "Network request failed. Please check your network connection" (or, on timeout, "Network connection timed out. Please check your network and try again").
-
-- Your login credentials **are not cleared**; once the network is restored, reopen the app and it will log in automatically, with no need to re-enter your password
-- Only if the message is something like "Incorrect username or password" does it mean the credentials are no longer valid and you need to log in again
+iOS only runs apps whose signature matches the device UDID, and the repository ships an unsigned IPA, so you re-sign it with your own Apple ID. A profile from a free Apple ID expires after 7 days — just re-sign; a paid developer account lasts longer.
 </details>
 
 <details>
-<summary><b>How do I quickly fill in the username on the login page? Why is the password field empty?</b></summary>
+<summary><b>Where is my data, and how do I reset everything?</b></summary>
 
-**Username memory**: successfully used usernames are remembered, and a history button appears to the right of the username field; tap it to select from the list, and the small cross to the right of each entry deletes that record. For security reasons, **only usernames are remembered here; passwords are not saved**.
-
-**An empty password field is normal**: after actively logging out (or being forced out by a login elsewhere or a password change) and returning to the login page, the password field is cleared automatically to avoid residue from the previous user's input; the username and the "Remember login" checkbox are still retained. Only when login **fails** is the password left in the field, so you can change one character and retry.
+Everything stays inside the app, with tokens encrypted, and other apps and file managers cannot read it; uninstalling removes all of it. To reset, choose **Clear all data** under **Settings → Data management** — this also clears remembered accounts and appearance settings, and the app closes itself afterwards.
 </details>
 
-<details>
-<summary><b>Why can messages be delayed by a dozen minutes?</b></summary>
+## Documentation
 
-To keep the notification shade clean (no persistent notices like "running in the background"), the app does not stay resident in the background for long. After the system reclaims the app, it switches to periodically waking up to deliver messages, so the worst-case delay is about 15 minutes. While the app is running (including when switched to the background), messages arrive in real time.
-</details>
+- [iOS build and install](iosApp/README.md)
+- [Android technical documentation (Chinese)](app/docs/Kirara%20Media%20安卓版技术栈文档.md)
+- [iOS migration notes and known limits (Chinese)](app/docs/Kirara%20Media%20iOS%20迁移路线.md)
+- Desktop counterpart: [Kirara_Server_Studio](https://gitee.com/kiraramoe/kirara_server_studio)
 
-<details>
-<summary><b>Can I still use it when the network is down?</b></summary>
+## License
 
-Browsing media itself requires a network connection. When the network is unstable, page load failures show a prompt and support retry; the @ friend list, comments, and messages reload once the network is restored.
-</details>
+This is closed-source proprietary software. All rights reserved.
 
-<details>
-<summary><b>Where are tokens/data stored?</b></summary>
+Decompiling, redistributing, modifying or republishing the software without authorisation is prohibited. Third-party open-source components remain the property of their respective authors.
 
-All data is stored inside the app, and sensitive information such as tokens is encrypted, unreadable by other apps and file managers; uninstalling the app clears everything.
-To reset, choose "Clear All Data" under "Settings → Data Management" (this also clears login state and tokens, requiring you to log in again).
-</details>
-
-<details>
-<summary><b>Installation says it conflicts with an installed version?</b></summary>
-
-This means an old version from another source was previously installed on the phone (for example, an early test debug build with a signature that does not match the official one). Please uninstall the old version before installing the new one; officially signed packages from 0.9.3-beta onward can be upgraded over the top directly, with data automatically retained.
-</details>
-
-<details>
-<summary><b>Video fullscreen or rotation behaves oddly?</b></summary>
-
-Rotating to landscape during playback automatically enters fullscreen and hides the system bars; during fullscreen, double-taps / accidental touches do not exit fullscreen, and the system back key exits fullscreen while the video keeps playing (without interruption); leaving the media page (switching to another tab or exiting) pauses playback automatically, and returning to the media page does not auto-resume. If you encounter an issue, try exiting fullscreen and rotating back to portrait, then retry.
-</details>
-
-<details>
-<summary><b>How do I install the iOS build? Why does it need re-signing?</b></summary>
-
-iOS is not on the App Store, so the repository produces `Kirara_Media_v<version>.ipa` (same naming as the APK, with `.sha256`). Three installation paths:
-
-1. **Xcode direct** (macOS + Xcode, phone visible to Xcode): open `iosApp/iosApp.xcodeproj`, pick the device, ⌘R;
-2. **Wireless OTA** (no cable): once the maintainer signs a build with a profile containing **your device UDID**, put the IPA and `manifest.plist` in one HTTPS directory and open the install page in Safari on the phone;
-3. **Sideloadly / AltStore re-sign** (you only have the unsigned IPA): re-sign it with **your own Apple ID**, then install.
-
-**Why re-sign**: iOS only runs an app whose signature matches that device's UDID; an unsigned IPA has no such binding, so the system will neither install nor run it. A profile from a free Apple ID **expires after 7 days** (the app stops opening or asks to be re-signed) — just sign it again; packages signed with a paid developer account last longer. **Day-to-day installation and use need no Mac**; only producing builds or changing code does.
-</details>
-
-<details>
-<summary><b>No interaction notifications on iOS after quitting the app?</b></summary>
-
-This is a known boundary of the iOS build: **APNs remote push is not wired up yet**, so reminders rely on the app's live connection plus a catch-up pull when it returns to the foreground. Therefore:
-
-- While the app is running (including in the background), reminders arrive in real time;
-- After the app is **fully quit**, no notification-shade reminders arrive; the next launch immediately catches up on that period;
-- Android is unaffected (still received after quitting, worst case about 15 minutes).
-
-If you need notification-shade reminders right after backgrounding the app, use the Android build.
-</details>
-
-<details>
-<summary><b>What else differs on iOS?</b></summary>
-
-- **Fullscreen**: the iPhone web view has no page-level fullscreen, so landscape playback uses **native immersive** (system bars hidden + bottom bar hidden + screen kept awake); iPad supports element fullscreen.
-- **Updates**: iOS has no in-app self-update, so "Settings → Software Update" only checks and explains; switching versions means sideloading a new IPA.
-- **Back key / background keep-alive settings**: iOS has no system back key (in-page controls and gestures instead) and no vendor battery pages to configure.
-- **Text size**: Dynamic Type is followed, but layouts for the largest accessibility sizes are not specifically adapted yet — if text gets crowded, set the system text size back to the standard step.
-</details>
-
-## 📄 License
-
-This software is **closed-source proprietary software. All Rights Reserved.**
-
-- Without authorization, decompiling, distributing, modifying, or republishing the software is prohibited
-- The copyrights of the third-party open-source components used by the software belong to their respective authors
-
-## 🙏 Acknowledgements
+## Credits
 
 - [Jellyfin](https://github.com/jellyfin/jellyfin)
 - [Jetpack Compose](https://developer.android.com/jetpack/compose)
-- [Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform) / [Kotlin Multiplatform](https://kotlinlang.org/docs/multiplatform.html) (Android and iOS share the same `:shared`)
+- [Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform) / [Kotlin Multiplatform](https://kotlinlang.org/docs/multiplatform.html)
 - [Coil](https://github.com/coil-kt/coil)
 - [OkHttp](https://github.com/square/okhttp)
 
 ---
 
-<div align="center">Made with ♥ by SenVenth AC</div>
-# Kirara_Media
-
-> A mobile client for Kirara Media that lets you enjoy media, join issue discussions, and interact with friends on your phone.
-> Through the three steps **Log in with KIRARA Passport → Link Token → Open Media Page**, you configure once and thereafter log in automatically with password-free direct access.
->
-> **iOS (on the same version line as Android since 1.5.0, distributed by sideloading)**: shares the same `:shared` code as Android (Media / Community / Interaction tabs, real auth and data repositories, live interaction notifications, photo picker, QR scanning, avatar crop pipeline, native toast HUD), with a SwiftUI host shell; requires **iOS 16.0+** (iPhone and iPad). **Not published on the App Store**: from `1.5.0` the build is also delivered as `Kirara_Media_v1.5.0.ipa` (same naming as the APK, with a `.sha256` file) — installation paths are under "Installation and Updates"; build and on-device steps: [`iosApp/README.md`](iosApp/README.md#上真机xcodeiphone-直连). Progress, evidence and remaining boundaries: [`app/docs/Kirara Media iOS 迁移路线.md`](app/docs/Kirara%20Media%20iOS%20迁移路线.md) §15.
-
-<div align="center">
-
-![Version](https://img.shields.io/badge/version-1.5.0-blue) ![Platform](https://img.shields.io/badge/platform-Android%2011%2B%20%7C%20iOS%2016%2B-lightgrey) ![Framework](https://img.shields.io/badge/Kotlin-Compose-purple) ![License](https://img.shields.io/badge/license-All%20Rights%20Reserved-red)
-
-</div>
-
----
-
-## ✨ Features
-
-- 🔐 **Log in once, stay password-free**: log in with your passport once, and the app enters automatically every time thereafter — no repeated username and password entry
-- 🔑 **Token Manager**: centrally keeps your media account tokens, supporting manual entry and QR-code import; tokens are stored encrypted and readable only on this device
-- 📷 **QR-code token import**: works with the QR-code export in the desktop "Token Manager" — just scan with your phone camera to import the token securely; the desktop QR code refreshes every 15 seconds, the token is transmitted encrypted, and only the owning account can import it; if camera permission is denied, you can jump to system settings with one tap to enable it, and the system back key exits the scan page directly
-- 🖥️ **Media on the go**: fully use Kirara Media on your phone — browse the library, view details, and watch videos, with visuals and controls consistent with the desktop
-- 🎬 **Immersive landscape playback**: rotating to landscape during playback automatically enters fullscreen and hides the system bars; during fullscreen, double-taps / accidental touches do not exit fullscreen, and pressing the system back key exits fullscreen but **the video keeps playing** (no pause); leaving the media page pauses playback automatically, and returning does not auto-resume
-- 🤖 **Auto-login**: opening the media page completes login automatically; when already logged in, it is intelligently skipped. If problems occur, it **honestly explains the reason** — for example, when offline the login page shows "Network request failed. Please check your network connection" instead of silently falling back to the login page; you can also log in manually at any time; when the server shows a **notice / maintenance page**, the bottom-right button turns into **Refresh** — tap it after handling the notice to reload and check whether service has resumed; when a dorm / campus network returns a **gateway block page** ("Access Denied"), that page is **shown right away** instead of spinning in a waiting overlay, so you can complete authentication on it directly
-- 🧾 **Remembered login usernames**: previously used usernames are remembered, and next time you can tap the button on the right of the username field to pick one from the history list with one tap, or delete entries one by one; **only usernames are remembered, passwords are never saved**
-- 🔒 **Password cleared on logout**: after actively logging out and returning to the login page, the password field is cleared automatically, leaving no input residue from the previous session (the username and the "Remember login" checkbox are retained)
-- 💬 **Issue comments**: open the comment area with one tap on the video detail page, supporting posting comments, replies, likes, and @ mentions of friends; @ mentions are highlighted in the theme color and **look the same from every account's view** (fixed: they used to lose the highlight for other viewers); **the reply input has its own @ button too** (pick users, backspace deletes the whole @ field — the full set of @ behaviors), the @ list **includes yourself** (mentioning yourself sends no push notification); replying to a reply automatically inserts an `@name` prefix that backspace removes as a whole; synced in real time with what you see on the desktop
-- 🔐 **Private mentions**: when you tap "@" to pick people, a "Private mention" checkbox appears below the list — that comment and every reply beneath it become **visible only to you and the people you mentioned**, while everyone else cannot see it at all (it simply does not exist for them); mentioned users still receive their usual interaction reminders, and you can still find it under your recent comments. The comment is prefixed with "Private:" and a privacy bar appears above the input so you can cancel before posting, and the "Share to homepage" button is hidden so the content cannot be shared; while replying inside a private thread the @ button is greyed out (the audience of a thread is fixed when it is posted, so no one else can be pulled in)
-- 💡 **Smooth hint bars**: the reply bar, the privacy bar and inline input errors no longer appear and vanish abruptly — they **fade in and out while expanding / collapsing in height**, gently pushing the input down and sliding it back, so the layout does not jump while you type
-- ⚡ **Smooth back-and-forth jumping**: tapping "View" in Community or Interactions now performs an **in-site switch instead of a full page reload**, so hopping from community to a title and straight back to another one no longer gets slower each time; rapid repeated taps coalesce into the latest target instead of queueing up, and if the in-site switch does not take effect (blocked by a gateway, for example) it falls back to a normal full load automatically
-- 🏷️ **Titles that are always right**: the title bar of the comment area and the resource name on favorites come straight from the server, so even during a jump they **never show the previous title's name or the bare site name "Jellyfin"**; titles you have already looked at come from memory, so revisiting a resource costs no network round-trip and the previously seen cases of titles falling back to the raw resource link are gone
-- 📊 **Glanceable counts**: like counts above 999 now shorten automatically (`1.2K` / `50.7K` / `1.3M`) instead of stretching an entry; on a comment row the "Reply" button stays exactly in place and the hearts of neighbouring entries line up
-- 📖 **Nothing gets truncated**: interaction entries, resource names and library tags now **wrap and show in full**, with the container growing downwards instead of adding "…"; tapping a resource name highlights the **whole rounded container** (no more square box around it)
-- 🗣️ **Community page**: browse what everyone shares on the homepage and like with one tap; tap a resource name to expand its cover preview (tap the image to view it larger — **pinch to zoom freely**), tap "View" to jump straight to watching, and your own comments can be shared to the community with one tap; the resource name on interaction entries also shows the parsed title rather than a generic "resource preview"
-- 🔔 **Interaction reminders**: **only this app's own interactions come through — media topic interactions + urge requests** — being @ mentioned, replied to, or liked, as well as **your urge request being liked / read by an administrator (approval completed)**, all trigger a notification in your phone's notification shade, with an unread green dot in the navigation bar; supports marking a single item read, marking all read, and clearing all (cleared entries **slide out + fade out while the entries below glide up smoothly**); resources can expand a cover preview with one-tap "View" jump, and cover loading failures auto-refresh and retry (no more "collapses on one tap"); **a new arrival jumps to the top automatically** — the list scrolls back to the top to show the fresh entry (smoothly while you are on the Interactions tab, instantly when you are on another tab, so it is already at the top when you switch back); **you still receive them after exiting the app** (Android only — see Platform differences for the iOS limitation). System broadcast / service notices and community homepage-share interactions belong to other apps and no longer mix into the interaction tab (the desktop notification center still receives everything)
-- 🎨 **Appearance themes**: follow the system, or freely switch between day / night modes and 48 accent colors, taking effect immediately
-- 🖼️ **Change avatar**: tap the "Edit" button on the account card in Settings and the card expands downwards to reveal "Change avatar" (you can also **just tap the avatar**); the picked image is center-cropped to a square automatically and a **preview confirmation dialog** pops up first (GIFs keep their animation, previewed with the first frame) — the upload only happens after you tap "Confirm upload"; the new avatar appears on **every page** immediately without restarting
-- ✏️ **Change nickname**: in the same expanded account card area, the "Change nickname" button sits **next to "Change avatar"** and opens a dialog for changing your display nickname (your login username stays unchanged); the account card updates immediately after saving, with no re-login needed
-- 🧹 **Data management**: separately "Clear Cache" or "Clear All Data" to free up space and rule out issues; after clearing, the app closes automatically and reopening gives a clean state; on startup, new versions also automatically clean up old installers to save space
-- ⚙️ **Resource preview settings**: you can make resource previews "always show" (by default collapsed, expanded by tapping the resource name); within favorites you can separately enable "Always show favorite resource previews" (on by default; when off, it reverts to expanding by tapping the resource name)
-- ⬆️ **In-app updates**: automatically checks for new versions, shows release notes, downloads in-app → **SHA-256 verification** → launches the system installer to complete installation; when you skip several versions, the release notes are listed **version by version**, so you can see what each missed release changed, and a mandatory release in between is never overlooked; if the download fails, you can switch to a browser fallback with one tap; upgrades use a unified official signature, so you can install over the old version directly and keep your data (**Android**; iOS is not on the App Store and has no self-update — switching versions means sideloading the new IPA, see Platform differences)
-- 🧭 **Unified navigation**: four tabs — Media / Community / Interactions / Settings — for easy switching, with the media page kept from reloading when switching tabs
-
-### 📱 Platform differences (Android / iOS)
-
-Both platforms share the same `:shared` business code (login, repositories, comments and interactions, photo picker / QR scan / avatar crop pipeline); only the host shell differs — Compose on Android, SwiftUI on iOS. These differences come from the platforms themselves, not from missing features:
-
-| Capability | Android 11+ | iOS 16+ |
-|---|---|---|
-| Installer | `Kirara_Media_vX.X.X.apk`, installed after allowing "Install unknown apps" | `Kirara_Media_vX.X.X.ipa` (same naming as the APK, shipped with a sibling `.sha256`); **not on the App Store**, so it has to be sideloaded (three ways below) |
-| In-app updates | Download + SHA-256 verification in-app → system installer installs over the old version | Check only: iOS has no self-update, so a new version means sideloading a new IPA |
-| Interaction notifications | Still received after quitting (delivered on system wake, worst case ~15 min) | No APNs: **nothing arrives after the app is fully quit**; a catch-up pull runs as soon as it returns to the foreground. Real-time while running (including in the background) |
-| Video fullscreen | Rotating to landscape enters page-level fullscreen, with native immersive as a fallback | iPhone's WKWebView has no page-level fullscreen ⇒ landscape uses **native immersive** (system bars hidden + bottom bar hidden + screen kept awake); iPad supports element fullscreen |
-| Background keep-alive | "Settings → Notification optimization settings" jumps to the vendor's battery / auto-start page | None needed (iOS schedules it automatically) |
-| Back action | System back key exits fullscreen / the scan page | No back key — in-page controls and gestures instead |
-
-## 📋 System Requirements
-
-**Android**
-
-- **OS**: Android 11 or later
-- **RAM**: 4 GB or more recommended
-- **Storage**: about 80 MB for installation, plus about 200 MB or more for browsing cache
-- **Google services**: no Google services framework is required; domestic phones can use it directly
-- **Devices**: supports mainstream Android phones and tablets
-
-**iOS** (since 1.5.0)
-
-- **OS**: iOS 16.0 or later
-- **Devices**: iPhone and iPad (layout adapts; the tablet picks the landscape background image)
-- **Signing**: not on the App Store — this repository produces an **unsigned IPA**, so installing it requires re-signing with your own Apple ID (Sideloadly / AltStore etc.), or an OTA install of a build signed by the maintainer with a profile containing your device UDID; a provisioning profile from a free Apple ID **expires after 7 days**, after which it must be re-signed
-- **Developer environment**: only producing builds / changing code needs macOS + Xcode; **day-to-day installation and use need no Mac**
-
-**Both**
-
-- **Network**: must be able to connect to Kirara Server (WiFi or a stable network is recommended for watching videos)
-
-## ⬇️ Installation and Updates
-
-### Android
-
-1. Go to this repository's **Releases** page and download the latest package (`Kirara_Media_vX.X.X.apk`)
-2. Allow "Install unknown apps" on your phone and complete the installation
-3. After the first launch, log in with your Kirara_Server passport to start using it
-4. The app has a built-in update check: when a new version is found it shows the release notes, and you can download and verify the package in-app, after which the system installer completes an over-the-top install; if the download fails, you can switch to a browser download
-
-> 📦 **In-app installation note**: the first time you use in-app updates, the system may prompt you to "Allow installation of unknown apps"; allowing once is enough. This is Android's normal security restriction for installing non-store apps and cannot be skipped.
-> ✅ **Over-the-top upgrades keep data**: since 0.9.3-beta, a unified official release signature has been used, so **new versions can be installed directly over the old one**, with login state, tokens, and settings and other local data automatically retained — no uninstall needed.
-> 🧹 **Automatic cleanup of old installers**: on first launch of a new version, previously downloaded installers are cleaned up automatically, with no manual action required.
-> ⚠️ You only need to uninstall before installing if you previously installed an **old version from another source** (for example, an early test debug build with a mismatched signature); uninstalling will clear local data.
-
-### iOS (since 1.5.0, not on the App Store)
-
-Artifacts use **the same naming as Android**: `Kirara_Media_v<version>.ipa` plus `<same>.ipa.sha256`
-(`<hash> *<filename>`, lowercase, no BOM, LF line endings), produced on macOS by `iosApp/deploy-device.sh`
-into `iosApp/build/device/`. Pick the path that matches your setup:
-
-| Path | Who it suits | Command / steps |
-|---|---|---|
-| **Xcode direct** (simplest) | You have macOS + Xcode and Xcode can see the phone (iOS 17+) | `open iosApp.xcodeproj` → pick the device → ⌘R; signing is automatic. Steps: [`iosApp/README.md`](iosApp/README.md#上真机xcodeiphone-直连) |
-| **Wireless OTA** (no cable) | Maintainer signs with a profile containing your device UDID | `bash iosApp/deploy-device.sh build` → signed IPA + `manifest.plist` + install page; put all three in **one HTTPS directory**, then open the install page in Safari on the phone (or `itms-services://?action=download-manifest&url=<dir>/manifest.plist`) |
-| **Sideloadly / AltStore re-sign** | You only have the unsigned IPA (no signing identity, or an older device) | `bash iosApp/deploy-device.sh unsigned` → `KiraraMedia-Release-unsigned.ipa`; re-sign it with **your own Apple ID** and install |
-
-> 🧩 **Naming and checksums**: both platforms use `Kirara_Media_v<version>.<ext>` plus a sibling `.sha256` (lowercase hash, `*` binary marker, LF line endings) — the APK and the IPA are identical in form, so they can share one release directory.
-> 🔢 **Version line**: since 1.5.0 iOS follows the **same version number as Android** (`MARKETING_VERSION = 1.5.0`); when re-releasing the same version, only the build number (`CURRENT_PROJECT_VERSION`, already 6 for 1.5.0) increments — otherwise iOS treats it as the same version and the old app has to be removed first.
-> ⏳ **7-day validity**: a profile signed with a free Apple ID expires after 7 days (the app stops opening and asks to be re-signed); sign it again with Sideloadly / AltStore. Packages signed with a paid developer account last longer.
-> 🚫 **No self-update**: iOS does not allow downloading and installing apps from inside an app, so "Settings → Software Update" only **checks** and shows the release notes on iOS; to change versions, sideload the new IPA.
-
-## 🚀 Quick Start
-
-### Three steps to get started
-
-```
-① Log in with KIRARA Passport  →  ② Link Token  →  ③ Open the media page for auto-login
-```
-
-1. **Log in with your passport**: enter your Kirara_Server account and password; after checking "Remember login", the app will enter automatically on future launches without re-entering them
-2. **Link a token**: choose either method —
-   - **QR-code import**: in the desktop "Token Manager", click the scan button to the right of the token to pop up a dynamic QR code, then point the phone's scan page at it to import automatically;
-   - **Manual entry**: fill in the media account token manually under "Settings → Token Manager" on the phone.
-   The **"Link Token" dot** at the bottom-right of the media page login screen can also trigger auto-login directly
-3. **One-tap access**: enter the "Media" tab, and the app will automatically complete login and stop at the Kirara Media homepage, ready to use
-
-> 💡 Don't worry if you run into login problems: the app tells you the specific reason (such as network, password, or verification code) and offers three entries — Retry / Go to Settings / Close — and you can log in manually on the page at any time.
-> 📡 For QR-code import, keep the phone and desktop on the same network, and note that the desktop QR code refreshes about every 15 seconds, so scan as soon as the pattern refreshes.
-
-### Common operations
-
-- **Media browsing**: tap the bottom-right button on the video detail page to open the comment area; the title bar automatically shows the video name
-- **Comment area**: post comments, reply, like, and @ mention friends; type `@` or tap the @ button next to the input (also in the reply input) to pick from the user list — **including yourself** (self-mentions send no push); picked @ mentions are highlighted in the theme color and look the same for everyone; replying to a reply auto-inserts an `@name` prefix that backspace deletes as a whole
-- **Community page**: browse and like homepage shares; tap a resource name to expand the cover preview (tap the image for a larger view — **pinch to zoom and drag to pan**), and tap "View" to jump back to the media page to watch
-- **My Favorites**: favorited videos expand their previews by default (you can turn off "Always show favorite resource previews" in "Settings → Resource Preview"); tap the image for a larger view, tap "View" to go straight there, and tap the resource name to collapse
-- **Immersive viewing**: rotating to landscape during playback enters fullscreen automatically; double-taps / accidental touches do not exit fullscreen, and the system back key exits fullscreen while playback continues; leaving the media page pauses playback automatically (on iOS the same immersion is done **natively**: system bars hidden + bottom bar hidden + screen kept awake; there is no back key, so fullscreen is exited with in-page controls)
-- **Interactions page**: view reminders for @ mentions, replies, and likes; supports marking read, marking all read, and clearing all; a green dot appears in the navigation bar when there are new messages; covers auto-refresh on load failure
-- **Software updates**: check for new versions under "Settings → Software Update", then download, verify, and install in-app; the first installation requires allowing "Install unknown apps" once (iOS has no self-update — this screen only checks and explains; switching versions means sideloading a new IPA)
-- **Data management**: clear cache or clear all data (after clearing, the app closes automatically and reopening gives a fresh state)
-- **Notification optimization settings**: "Background keep-alive settings" guides you to add this app to the system battery optimization whitelist, and "Auto-start" guides you to enable auto-start, so messages arrive more promptly
-
-Core design:
-
-- **Consistent with the desktop experience**: the media interface and operating habits are consistent with the desktop, and the login method, comment content, and shared content are the same set, so phone and desktop connect seamlessly
-- **One codebase for Android and iOS**: both platforms share the same `:shared` business code (login, repositories, comments and interactions, photo picker / QR scan / crop), and only the host shell is platform-specific (Compose on Android, SwiftUI on iOS), so features and wording never diverge between them
-- **Effortless QR-code import**: no need to manually transcribe a long token — scanning automatically recognizes it, verifies ownership, and writes it to disk; only the owning account can import it, making it both secure and convenient
-- **Configure once, stay password-free**: the login state renews automatically; for security reasons, you need to log in again after changing phones or reinstalling the app
-- **No trouble even on failure**: auto-login submits only when it confirms it is safe, and in cases such as verification codes or network anomalies it honestly informs you and hands back control — it never retries repeatedly or fills in wrong values
-- **Updates are secure and verifiable**: installers downloaded in-app undergo integrity verification (SHA-256, etc.) before installation; if verification fails, installation is refused with a prompt, avoiding corrupted or tampered files
-- **Messages are hard to miss**: interaction messages received while the app is closed are delivered on the next launch or system wake, so you miss as little as possible
-- **Privacy first**: sensitive information such as tokens is stored encrypted inside the app, unreadable by other apps and file managers; sensitive content such as passwords never appears in any log
-- **Quiet and power-saving**: no persistent notification is used in the background, and only genuinely new messages appear in the notification shade — no extra "running" notices
-
-## ❓ FAQ
-
-<details>
-<summary><b>QR-code import fails / shows rejected?</b></summary>
-
-When importing by scanning, the KIRARA account logged in on the phone must match the desktop account that exported the token — a token can only be imported into the account that owns it, and tokens belonging to others are rejected. In addition, the desktop QR code auto-updates about every 15 seconds; if you see "QR code expired", wait for the pattern on the desktop to refresh and scan again immediately, keeping the desktop scan window open.
-</details>
-
-<details>
-<summary><b>In-app update says it needs "Install unknown apps" permission?</b></summary>
-
-This is Android's normal security restriction for installing from non-store sources and cannot be skipped. The first time you use in-app updates, allow "Install unknown apps" in the system dialog that appears; after allowing once, installation works normally. If you want to manage that permission later, you can turn it on or off at any time under "System Settings → Apps → This app → Install unknown apps".
-</details>
-
-<details>
-<summary><b>What if the in-app update download fails?</b></summary>
-
-The download verifies file integrity (SHA-256, etc.). If it fails due to network fluctuations, download source restrictions, or file corruption, the dialog offers two entries — "Retry" and "Browser download": try retrying first; if it still fails, download the installer in a browser and install it manually — the result is the same (both are the same officially signed package).
-</details>
-
-<details>
-<summary><b>I stop receiving messages after being in the background for a while?</b></summary>
-
-Some domestic systems restrict network access after an app goes to the background, causing the message channel to disconnect (messages from that period are delivered in full on the next connection).
-You can go to "Settings → Notification optimization settings" and tap "Background keep-alive settings" to add this app to the system battery optimization whitelist, or tap "Auto-start" to enable auto-start. That way messages arrive more promptly.
-</details>
-
-<details>
-<summary><b>Why does opening the app while offline return me to the login screen?</b></summary>
-
-After checking "Remember login", the app automatically attempts to log in on startup. **Without a network, that attempt is bound to fail, so it returns to the login screen** — this is normal, and the login page clearly shows "Network request failed. Please check your network connection" (or, on timeout, "Network connection timed out. Please check your network and try again").
-
-- Your login credentials **are not cleared**; once the network is restored, reopen the app and it will log in automatically, with no need to re-enter your password
-- Only if the message is something like "Incorrect username or password" does it mean the credentials are no longer valid and you need to log in again
-</details>
-
-<details>
-<summary><b>How do I quickly fill in the username on the login page? Why is the password field empty?</b></summary>
-
-**Username memory**: successfully used usernames are remembered, and a history button appears to the right of the username field; tap it to select from the list, and the small cross to the right of each entry deletes that record. For security reasons, **only usernames are remembered here; passwords are not saved**.
-
-**An empty password field is normal**: after actively logging out (or being forced out by a login elsewhere or a password change) and returning to the login page, the password field is cleared automatically to avoid residue from the previous user's input; the username and the "Remember login" checkbox are still retained. Only when login **fails** is the password left in the field, so you can change one character and retry.
-</details>
-
-<details>
-<summary><b>Why can messages be delayed by a dozen minutes?</b></summary>
-
-To keep the notification shade clean (no persistent notices like "running in the background"), the app does not stay resident in the background for long. After the system reclaims the app, it switches to periodically waking up to deliver messages, so the worst-case delay is about 15 minutes. While the app is running (including when switched to the background), messages arrive in real time.
-</details>
-
-<details>
-<summary><b>Can I still use it when the network is down?</b></summary>
-
-Browsing media itself requires a network connection. When the network is unstable, page load failures show a prompt and support retry; the @ friend list, comments, and messages reload once the network is restored.
-</details>
-
-<details>
-<summary><b>Where are tokens/data stored?</b></summary>
-
-All data is stored inside the app, and sensitive information such as tokens is encrypted, unreadable by other apps and file managers; uninstalling the app clears everything.
-To reset, choose "Clear All Data" under "Settings → Data Management" (this also clears login state and tokens, requiring you to log in again).
-</details>
-
-<details>
-<summary><b>Installation says it conflicts with an installed version?</b></summary>
-
-This means an old version from another source was previously installed on the phone (for example, an early test debug build with a signature that does not match the official one). Please uninstall the old version before installing the new one; officially signed packages from 0.9.3-beta onward can be upgraded over the top directly, with data automatically retained.
-</details>
-
-<details>
-<summary><b>Video fullscreen or rotation behaves oddly?</b></summary>
-
-Rotating to landscape during playback automatically enters fullscreen and hides the system bars; during fullscreen, double-taps / accidental touches do not exit fullscreen, and the system back key exits fullscreen while the video keeps playing (without interruption); leaving the media page (switching to another tab or exiting) pauses playback automatically, and returning to the media page does not auto-resume. If you encounter an issue, try exiting fullscreen and rotating back to portrait, then retry.
-</details>
-
-<details>
-<summary><b>How do I install the iOS build? Why does it need re-signing?</b></summary>
-
-iOS is not on the App Store, so the repository produces `Kirara_Media_v<version>.ipa` (same naming as the APK, with `.sha256`). Three installation paths:
-
-1. **Xcode direct** (macOS + Xcode, phone visible to Xcode): open `iosApp/iosApp.xcodeproj`, pick the device, ⌘R;
-2. **Wireless OTA** (no cable): once the maintainer signs a build with a profile containing **your device UDID**, put the IPA and `manifest.plist` in one HTTPS directory and open the install page in Safari on the phone;
-3. **Sideloadly / AltStore re-sign** (you only have the unsigned IPA): re-sign it with **your own Apple ID**, then install.
-
-**Why re-sign**: iOS only runs an app whose signature matches that device's UDID; an unsigned IPA has no such binding, so the system will neither install nor run it. A profile from a free Apple ID **expires after 7 days** (the app stops opening or asks to be re-signed) — just sign it again; packages signed with a paid developer account last longer. **Day-to-day installation and use need no Mac**; only producing builds or changing code does.
-</details>
-
-<details>
-<summary><b>No interaction notifications on iOS after quitting the app?</b></summary>
-
-This is a known boundary of the iOS build: **APNs remote push is not wired up yet**, so reminders rely on the app's live connection plus a catch-up pull when it returns to the foreground. Therefore:
-
-- While the app is running (including in the background), reminders arrive in real time;
-- After the app is **fully quit**, no notification-shade reminders arrive; the next launch immediately catches up on that period;
-- Android is unaffected (still received after quitting, worst case about 15 minutes).
-
-If you need notification-shade reminders right after backgrounding the app, use the Android build.
-</details>
-
-<details>
-<summary><b>What else differs on iOS?</b></summary>
-
-- **Fullscreen**: the iPhone web view has no page-level fullscreen, so landscape playback uses **native immersive** (system bars hidden + bottom bar hidden + screen kept awake); iPad supports element fullscreen.
-- **Updates**: iOS has no in-app self-update, so "Settings → Software Update" only checks and explains; switching versions means sideloading a new IPA.
-- **Back key / background keep-alive settings**: iOS has no system back key (in-page controls and gestures instead) and no vendor battery pages to configure.
-- **Text size**: Dynamic Type is followed, but layouts for the largest accessibility sizes are not specifically adapted yet — if text gets crowded, set the system text size back to the standard step.
-</details>
-
-## 📄 License
-
-This software is **closed-source proprietary software. All Rights Reserved.**
-
-- Without authorization, decompiling, distributing, modifying, or republishing the software is prohibited
-- The copyrights of the third-party open-source components used by the software belong to their respective authors
-
-## 🙏 Acknowledgements
-
-- [Jellyfin](https://github.com/jellyfin/jellyfin)
-- [Jetpack Compose](https://developer.android.com/jetpack/compose)
-- [Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform) / [Kotlin Multiplatform](https://kotlinlang.org/docs/multiplatform.html) (Android and iOS share the same `:shared`)
-- [Coil](https://github.com/coil-kt/coil)
-- [OkHttp](https://github.com/square/okhttp)
-
----
-
-<div align="center">Made with ♥ by SenVenth AC</div>
+<p align="center">Made with ❤ by SenVenth AC</p>
